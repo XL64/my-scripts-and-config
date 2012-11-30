@@ -1,0 +1,49 @@
+#!/bin/bash
+
+opt1="-bynode -byslot -d --debug-devel -debug --debug --debug-daemons --debug-daemons-file -display-map --display-map --do-not-launch -h --help --no-daemonize -nolocal --nolocal -nooversubscribe --nooversubscribe --noprefix -q --quiet -reuse-daemons --reuse-daemons -tv --tv -v --verbose -v --verbose -V --version";
+
+opt2="-aborted --aborted --app -c -np --np -debugger --debugger -H -host --host -hostfile --hostfile -machinefile --machinefile -mca --mca -n --n -npernode --npernode -path --path -pernode --pernode --prefix --tmpdir --universe -wd --wd -wdir --wdir -x"
+
+opt3="-gmca --gmca"
+options="";
+END=0
+
+while [ $END -eq 0 ]; do
+    opt=0
+    for j in $opt1; do
+	if [ $1 = $j ]; then
+ 	    opt=1;
+	fi
+    done
+    for j in $opt2; do
+	if [ $1 = $j ]; then
+ 	    opt=2;
+	fi
+    done
+    for j in $opt3; do
+	if [ $1 = $j ]; then
+ 	    opt=3;
+	fi
+    done
+
+    if [ $opt -ge 1 ]; then
+	options="$options $1";
+	shift
+	if [ $opt -ge 2 ]; then
+	    options="$options $1";
+	    shift
+	    if [ $opt -eq 3 ]; then
+		options="$options $1";
+		shift
+	    fi;
+	fi;
+    fi;
+    if [ $opt -eq 0 ]; then
+	END=1;
+    fi
+    
+    if [ $# -eq 0 ]; then
+	END=1
+    fi
+done
+/opt/openmpi/bin/mpirun $options /opt/scripts/lock.sh $*

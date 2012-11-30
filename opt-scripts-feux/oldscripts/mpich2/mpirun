@@ -1,0 +1,50 @@
+#!/bin/bash
+
+opt1="-h -help --help -l -bnr -1 -ifhn -tv -tvsu -gdb -m -ecfn -envall -genvall -envnone -genvnone";
+
+opt2="-n -np -gn -gnp -wdir -gwdir -path -gpath -umask -gumask -host -ghost -soft -gsoft -arch -garch -envlist -genvlist -machinefile -s -a"
+
+opt3="env genv"
+options="";
+END=0
+
+
+while [ $END -eq 0 ]; do
+    opt=0
+    for j in $opt1; do
+	if [ $1 = $j ]; then
+ 	    opt=1;
+	fi
+    done
+    for j in $opt2; do
+	if [ $1 = $j ]; then
+ 	    opt=2;
+	fi
+    done
+    for j in $opt3; do
+	if [ $1 = $j ]; then
+ 	    opt=3;
+	fi
+    done
+
+    if [ $opt -ge 1 ]; then
+	options="$options $1";
+	shift
+	if [ $opt -ge 2 ]; then
+	    options="$options $1";
+	    shift
+	    if [ $opt -eq 3 ]; then
+		options="$options $1";
+		shift
+	    fi;
+	fi;
+    fi;
+    if [ $opt -eq 0 ]; then
+	END=1;
+    fi
+    
+    if [ $# -eq 0 ]; then
+	END=1
+    fi
+done
+/opt/mpich2/bin/mpirun $options /opt/scripts/lock.sh $*

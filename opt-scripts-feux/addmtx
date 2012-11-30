@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+
+name=`uname -n`
+if [ $name = "vulcain" ]; then
+    sudo /opt/scripts/addmtx.pl $*
+else
+    echo "Ce script doit etre utilisé sur vulcain"
+fi
+
+
