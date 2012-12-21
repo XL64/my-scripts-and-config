@@ -53,3 +53,4 @@
 ;;(load-library "smart-tab.el")
 ;;(require 'smart-tab)
 ;;(global-smart-tab-mode 1)
+(load "~/.emacs.d/nxhtml/autostart")
