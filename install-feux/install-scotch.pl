@@ -108,7 +108,7 @@ $makefile .= "LIB     = .a		  \n";
 $makefile .= "OBJ     = .o		  \n";
 $makefile .= "\n";
 $makefile .= "AR      = ar		  \n";
-$makefile .= "MAKE    = make 	  \n";
+$makefile .= "MAKE    = make -j 8  \n";
 $makefile .= "ARFLAGS = -ruv	  \n";
 $makefile .= "CFLAGS  = -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_PTHREAD -DSCOTCH_RENAME _TYPE_ -Drestrict= -DSCOTCH_COLLECTIVE \n";
 $makefile .= "LDFLAGS = -lz -lm -lrt  \n";
