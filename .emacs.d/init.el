@@ -57,4 +57,5 @@
 ;;(require 'smart-tab)
 ;;(global-smart-tab-mode 1)
 
-(load "~/.emacs.d/nxhtml/autostart")
+(if (featurep 'rng-auto)
+    (load "~/.emacs.d/nxhtml/autostart"))
