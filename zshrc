@@ -14,6 +14,7 @@ fi
 if [[ $machine == "Cronos" ]];
 then
     export PATH=/usr/local/bin:/usr/local/sbin:$PATH
+    export PATH=/usr/local/share/python:$PATH
     export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
 # Finished adapting your PATH environment variable for use with MacPorts.
 
@@ -162,6 +163,12 @@ function compare_columns()
     
     LC_ALL=en awk -v col1=$col1 -v col2=$col2 'FNR==NR{a[NR]=$col1; }FNR!=NR{sum1=sum1+$col2*$col2 ;sum2+=($col2-a[FNR])*($col2-a[FNR])}END{print "sum(b_i**2)", sum1, "sum((b_i-a_i)**2)", sum2, "sqrt(sum(b_i-a_i)**2)/sum(b_i**2))", sqrt(sum2/sum1)}' $file1 $file2
 }
+
+function duf()
+{
+    du -sk "$@" | sort -n | while read size fname; do for unit in k M G T P E Z Y; do if [ $size -lt 1024 ]; then echo -e "${size}${unit}\t${fname}"; break; fi; size=$((size/1024)); done; done
+}
+
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
