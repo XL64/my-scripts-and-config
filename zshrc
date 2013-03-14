@@ -3,13 +3,9 @@ OS=`uname`
 if [[ $OS == "Darwin" ]];
 then
     machine=`scutil --get ComputerName | awk '{print $1}'`
+else
+       machine=$HOST
 fi
-#if [[ $HOST -regex-match  "Cronos." || $HOST -regex-match "cronos" ]];
-#then
-#       machine="Cronos"
-#else
-#       machine=$HOST
-#fi
 #echo $machine
 if [[ $machine == "Cronos" ]];
 then
