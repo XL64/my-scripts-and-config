@@ -26,6 +26,9 @@
 (add-to-list 'load-path "~/.emacs.d/elisp")
 (add-to-list 'load-path "~/.emacs.d/smart-tab")
 (load-library "ppindent.el")
+(load-library "cmake-mode.el")
+(load "~/.emacs.d/elisp/ess-12.09-2/lisp/ess-site")
+;;(require 'ess-site)
 ;;(require 'tex-site)
 ;;(load "preview-latex.el" nil t t)
 (global-auto-revert-mode t)
@@ -53,4 +56,6 @@
 ;;(load-library "smart-tab.el")
 ;;(require 'smart-tab)
 ;;(global-smart-tab-mode 1)
-(load "~/.emacs.d/nxhtml/autostart")
+
+(if (featurep 'rng-auto)
+    (load "~/.emacs.d/nxhtml/autostart"))
