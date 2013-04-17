@@ -186,4 +186,6 @@ unsetopt share_history # share command history data
 
 # Used to get ssh-agent in screen
 # required a setenv SSH_AUTH_SOCK "/tmp/ssh-agent-$USER-screen" in screenrc
-test $SSH_AUTH_SOCK && ln -sf "$SSH_AUTH_SOCK" "/tmp/ssh-agent-$USER-screen"
+if [ $SSH_AUTH_SOCK != "/tmp/ssh-agent-$USER-screen" ]; then
+    test $SSH_AUTH_SOCK && ln -sf "$SSH_AUTH_SOCK" "/tmp/ssh-agent-$USER-screen"
+fi

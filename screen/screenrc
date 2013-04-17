@@ -35,6 +35,8 @@ bind f eval "hardstatus ignore"
 # Show hardstatus: ctrl-a F
 bind F eval "hardstatus alwayslastline"
 
+bind R eval "source $HOME/.screenrc" "echo '.screenrc reloaded!'"
+
 #used to get ssh-agent witch was linked with :
 # > test $SSH_AUTH_SOCK && ln -sf "$SSH_AUTH_SOCK" "/tmp/ssh-agent-$USER-screen"
 # in *shrc
