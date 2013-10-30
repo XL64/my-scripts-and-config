@@ -1,6 +1,7 @@
 import subprocess 
 import os, sys
-
+import shutil
+g_root = u"/opt/cluster/plafrim-dev/"
 g_base = u"/opt/cluster/plafrim-dev/%s/%s/%s/%s/%s/%s/%s"
 g_base_nompi = u"/opt/cluster/plafrim-dev/%s/%s/%s/%s/%s"
 g_modules =  u"module purge; module load compiler/%s/%s mpi/%s/%s lib/mkl/10.3.9.293 lib/hwloc/latest;"
@@ -15,7 +16,7 @@ AR      = ar
 MAKE    = make
 ARFLAGS = -ruv	
 CAT     = cat
-CFLAGS  = -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DCOMMON_RANDOM_FIXED_SEED -DSCOTCH_PTHREAD -DSCOTCH_RENAME -DSCOTCH_RENAME_PARSER __TYPE__ -Drestrict=
+CFLAGS  = -g -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DSCOTCH_DETERMINISTIC -DSCOTCH_PTHREAD -DSCOTCH_RENAME -DSCOTCH_RENAME_PARSER __TYPE__ -Drestrict=
 LDFLAGS = -lz -lm -lrt
 LEX     = flex  -Pscotchyy -olex.yy.c
 YACC    = bison -pscotchyy -y -b y
@@ -42,7 +43,7 @@ CF90PROG    = __FC__
 MCFPROG     = __MPFC__
 CF90CCPOPT  = __FC_PREPROC__
 # Compilation options for optimization (make expor)
-CCFOPT      = -O3
+CCFOPT      = -g -O3
 # Compilation options for debug (make | make debug)
 CCFDEB      = -g3
 
@@ -598,24 +599,61 @@ Check what need to be installed.
                       help='Install the missing build with srcdir',
                       metavar='source_dir', type=str, default=[])
 
+    parser.add_option('-f', '--force-rebuild', dest='force',
+                      help='Force rebuild of all install',
+                      action='store_true', default=False)
+
+    parser.add_option('-d', '--clean', dest='clean',
+                      help='Clean old installs',
+                      action='store_true', default=False)
+
+    parser.add_option('-r', '--dryrun', dest='dryrun',
+                      help='dry run',
+                      action='store_true', default=False)
+
     # Parse the command line
     (options, args) = parser.parse_args()
     
     compilers = get_available(u"compiler", [])
     mpis = get_available(u"mpi", [u"mpiexec"])
     
-    test = "toto"
+    test = u"toto"
     if  u"scotch" in options.programme :
-        test = u"int32/lib/libscotch.a"
+        test = u"int32/lib/libptscotch.a"
     if u"pastix" in options.programme:
         test = u"int32/lib/libpastix.a"
+    if options.force:
+        test = u"no_test"
 
     if options.version == [] or options.programme == []:
         print "version and programme required"
         print usage
         sys.exit(1)
 
-    missings = missing_installs(options.programme, options.version, test, [compilers, mpis])
+    if options.clean:
+        base = os.path.join(g_root, options.programme, options.version)
+        if os.path.isdir(base):
+            for compiler in os.listdir(base):
+                for version in os.listdir(os.path.join(base, compiler)):
+                    if not version == "latest":
+                        if not [compiler, version] in compilers:
+                            print "remove %s %s: %s" %(compiler, version, os.path.join(base, compiler, version))
+                            if not options.dryrun:
+                                shutil.rmtree(os.path.join(base, compiler, version))
+
+            for compiler in compilers:
+                base=os.path.join(g_root, options.programme, options.version, compiler[0], compiler[1])
+                if os.path.isdir(base):
+                    for mpi in os.listdir(base):
+                        for version in os.listdir(os.path.join(base, mpi)):
+                            if not version == "latest":
+                                if not [mpi, version] in mpis:
+                                    print "remove %s %s: %s" %(mpi, version, os.path.join(base, mpi, version))
+                                    if not options.dryrun:
+                                        shutil.rmtree(os.path.join(base, mpi, version))
+
+    if options.count or options.list or options.source_dir:
+        missings = missing_installs(options.programme, options.version, test, [compilers, mpis])
 
     if options.count:
         print len(missings)
@@ -630,5 +668,6 @@ Check what need to be installed.
             print usage
             sys.exit(1)
         for missing in missings:
-            install(options.programme, options.version, options.source_dir, options.scotch_version, missing)
+            if not options.dryrun:
+                install(options.programme, options.version, options.source_dir, options.scotch_version, missing)
             
