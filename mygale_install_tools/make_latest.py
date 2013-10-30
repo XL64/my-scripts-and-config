@@ -34,7 +34,29 @@ def get_modules(string):
     return modules
 
 if __name__ == "__main__":
-    root = sys.argv[1]
+    from optparse import OptionParser
+    # Defining the options of the program
+    usage="""usage: %prog -r [root directory] [options] 
+
+Create latest file in root directory
+"""
+    username    = os.getenv('USER')
+
+    parser = OptionParser(usage=usage)
+
+    parser.add_option("-r", "--root", dest="root",
+                      help="Root directory",
+                      metavar='path', type=str, default=[])
+
+    parser.add_option('-d', '--dryrun', dest='dryrun',
+                      help='dry run',
+                      action='store_true', default=False)
+
+    # Parse the command line
+    (options, args) = parser.parse_args()
+
+    root = options.root
+
     p = subprocess.Popen(u"module av", 
                          stderr=subprocess.PIPE, 
                          stdout=subprocess.PIPE, shell=True)
@@ -48,14 +70,17 @@ if __name__ == "__main__":
                           reverse = True,
                           cmp=version_compare)
         dir = u"%s/%s" %(root,key)
-        mkdir_p(dir)
+        if not os.path.isdir(dir):
+            mkdir_p(dir)
         filename = u'%s/%s' % (dir, u'latest')
-        print filename
-        try:
-            os.remove(filename)
-        except OSError:
-            pass
-        os.symlink(compiler[0], filename)
+        if os.path.isdir(filename):
+            print "Removing %s" % filename
+            if not options.dryrun:
+                os.remove(filename)
+
+        print "Symlink %s %s" %(compiler[0], filename)
+        if not options.dryrun:
+            os.symlink(compiler[0], filename)
 
         #subprocess.Popen([u"ln", u"-sT", compiler[0], u'latest'],
         #                 cwd = dir).wait()
@@ -67,14 +92,19 @@ if __name__ == "__main__":
                                  reverse = True,
                                  cmp = version_compare)
                     dir =  u"%s/%s/%s/%s" %(root,key,version,key2)
-                    mkdir_p(dir)
+                    print "mkdir -p %s" % dir
+                    if not options.dryrun:
+                        mkdir_p(dir)
 
                     filename = u'%s/%s' % (dir, u'latest')
-                    try:
-                        os.remove(filename)
-                    except OSError:
-                        pass
-                    os.symlink(mpi[0], filename)
+                    if os.path.isdir(filename):
+                        print "Try remooving %s" % filename
+                        if not options.dryrun:
+                            os.remove(filename)
+
+                    print "Symlink %s %s" %(mpi[0], filename)
+                    if not options.dryrun:
+                        os.symlink(mpi[0], filename)
                            
                 #subprocess.Popen([u"ln", u"-sT", mpi[0], u'latest'],
                 #                 cwd = dir).wait()
