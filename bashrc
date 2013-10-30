@@ -35,7 +35,54 @@ then
     export LP_ENABLE_SVN=0
 fi
 
-# Used to get ssh-agent in screen
-# required a setenv SSH_AUTH_SOCK "/tmp/ssh-agent-$USER-screen" in screenrc
-alias screen="test $SSH_AUTH_SOCK && ln -sf \"$SSH_AUTH_SOCK\" \"/tmp/ssh-agent-$USER-screen\"; screen"
+
+# preserve the X environment variables
+store_display() {
+    export | grep '\(DISPLAY\|XAUTHORITY\)=' > ~/.display.${HOSTNAME}
+}
+
+# read out the X environment variables
+update_display() {
+    echo eval "[ -r ~/.display.${HOSTNAME} ] && source ~/.display.${HOSTNAME}";
+}
+
+# WINDOW is set when we are in a screen session
+if [ -n "$WINDOW" ] ; then 
+    # update the display variables right away
+    [ -r ~/.display.${HOSTNAME} ] && source ~/.display.${HOSTNAME}
+    
+    
+    # setup the preexec function to update the variables before each command
+    preexec () {
+        #`update_display`
+	:;
+    }
+fi
+
+# this will reset the ssh-auth-sock link and screen display file before we run screen
+_screen_prep() {
+    if [ -n "$SSH_AUTH_SOCK" ] ; then
+	if [ "$SSH_AUTH_SOCK" != "$HOME/.screen/ssh-auth-sock.$HOSTNAME" ] ; then
+            ln -fs "$SSH_AUTH_SOCK" "$HOME/.screen/ssh-auth-sock.$HOSTNAME"
+	fi
+    fi
+    store_display
+}
+
+function compare_columns()
+{
+    local file1=$1
+    local col1=$2
+    local file2=$3
+    local col2=$4
+    
+    LC_ALL=en awk -v col1=$col1 -v col2=$col2 'FNR==NR{a[NR]=$col1; }FNR!=NR{sum1=sum1+$col2*$col2 ;sum2+=($col2-a[FNR])*($col2-a[FNR])}END{print "sum(b_i**2)", sum1, "sum((b_i-a_i)**2)", sum2, "sqrt(sum(b_i-a_i)**2)/sum(b_i**2))", sqrt(sum2/sum1)}' $file1 $file2
+}
+
+# WINDOW is not set when we are not in a screen session
+if [ -z "$WINDOW" ] ; then 
+    alias screen='_screen_prep ; screen'
+else
+    alias screen='[ -r ~/.display.${HOSTNAME} ] && source ~/.display.${HOSTNAME} ; screen'	
+fi
 
