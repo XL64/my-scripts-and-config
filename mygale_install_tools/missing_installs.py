@@ -641,6 +641,7 @@ Check what need to be installed.
                             if not options.dryrun:
                                 shutil.rmtree(os.path.join(base, compiler, version))
 
+        if not u"nompi" in options.programme:
             for compiler in compilers:
                 base=os.path.join(g_root, options.programme, options.version, compiler[0], compiler[1])
                 if os.path.isdir(base):
@@ -656,7 +657,7 @@ Check what need to be installed.
         missings = missing_installs(options.programme, options.version, test, [compilers, mpis])
 
     if options.count:
-        print "%d installations requires" %( len(missings))
+        print "%d installations required" %( len(missings))
     if options.list:
         for missing in missings:
             print missing
