@@ -417,14 +417,18 @@ def install(programme, version, source_dir, scotch_version, libs):
         if "pastix" in programme:
             prefix = os.path.join(prefix, "scotch", scotch_version)
         prefix = os.path.join(prefix, version_int[0])
-        scotch_home = os.path.join(scotch_home,
-                                   u"scotch-nompi", scotch_version,
-                                   compiler[0], compiler[1])
         if mpi:
-            scotch_home = os.path.join(scotch_home, mpi[0], mpi[1])
+            scotch_home = os.path.join(scotch_home,
+                                       u"scotch", scotch_version,
+                                       compiler[0], compiler[1],
+                                       mpi[0], mpi[1])
+        else:
+            scotch_home = os.path.join(scotch_home,
+                                       u"scotch-nompi", scotch_version,
+                                       compiler[0], compiler[1])
+
         scotch_home = os.path.join(scotch_home,
                                    version_int[0])
-
         modulefile = g_module_file
         if ("scotch" in programme):
             makefile = g_scotch_makefile
@@ -553,6 +557,7 @@ def missing_installs(package_name, version, test, depends, scotch_version):
                 if "pastix" in package_name:
                     test_file2 = os.path.join(test_file2, "scotch", scotch_version)
                 test_file2 = os.path.join(test_file2, test)
+
                 if not os.path.exists(test_file2):
                     mpi_lib = os.path.join(u"/opt/cluster/mpi/",
                                            mpi[0], mpi[1],
