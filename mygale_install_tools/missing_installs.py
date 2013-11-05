@@ -1,31 +1,29 @@
-import subprocess 
+import subprocess
 import os, sys
 import shutil
 g_root = u"/opt/cluster/plafrim-dev/"
-g_base = u"/opt/cluster/plafrim-dev/%s/%s/%s/%s/%s/%s/%s"
-g_base_nompi = u"/opt/cluster/plafrim-dev/%s/%s/%s/%s/%s"
 g_modules =  u"module purge; module load compiler/%s/%s mpi/%s/%s lib/mkl/10.3.9.293 lib/hwloc/latest;"
 g_modules_nompi =  u"module purge; module load compiler/%s/%s lib/mkl/10.3.9.293 lib/hwloc/latest;"
 g_scotch_makefile = u"""
 prefix  = __PREFIX__
 EXE     =
-LIB     = .a	
+LIB     = .a
 OBJ     = .o
 
 AR      = ar
 MAKE    = make
-ARFLAGS = -ruv	
+ARFLAGS = -ruv
 CAT     = cat
 CFLAGS  = -g -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DSCOTCH_DETERMINISTIC -DSCOTCH_PTHREAD -DSCOTCH_RENAME -DSCOTCH_RENAME_PARSER __TYPE__ -Drestrict= -fPIC
 LDFLAGS = -lz -lm -lrt
 LEX     = flex  -Pscotchyy -olex.yy.c
 YACC    = bison -pscotchyy -y -b y
-CAT     = cat		
-CP      = cp		
-LN      = ln	
-MKDIR   = mkdir	
-MV      = mv		
-RANLIB  = ranlib	
+CAT     = cat
+CP      = cp
+LN      = ln
+MKDIR   = mkdir
+MV      = mv
+RANLIB  = ranlib
 CCS     = __CC__
 CCP     = __MPCC__
 CCD     = __MPCC__
@@ -356,7 +354,7 @@ def get_available(name, excludes):
     for exclude in excludes:
         cmd += u" grep -v %s |" % exclude
     cmd += u"sed -e 's/(.*)//g'"
-    
+
     compiler_list=subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE).communicate()[0].split()
     out = []
     for compiler in compiler_list:
@@ -392,7 +390,7 @@ def install(programme, version, source_dir, scotch_version, libs):
     global g_pastix_makefile
     global g_scotch_makefile
     global g_module_file
-    global g_base
+    global g_root
 
     compiler = libs[0]
     if libs[1] == None:
@@ -405,30 +403,28 @@ def install(programme, version, source_dir, scotch_version, libs):
                                                      compiler[1])
         if (not os.path.exists(mpi_lib)):
             print "%s does not exists" % (mpi_lib)
-            return 
+            return
 
     versions = [[u"int32", u"-DINTSIZE32"],
                 [u"int64", u"-DINTSIZE64"]]
     for version_int in versions:
-        if mpi == None:
-            prefix = g_base_nompi
-            scotch_home = g_base_nompi
-            prefix = prefix % ( programme, version,
-                                compiler[0], compiler[1],
-                                version_int[0])    
-            scotch_home = scotch_home % ( u"scotch-nompi", scotch_version,
-                                          compiler[0], compiler[1],
-                                          version_int[0])    
-        else:
-            prefix = g_base
-            scotch_home = g_base
-            prefix = prefix % ( programme, version,
-                                compiler[0], compiler[1],
-                                mpi[0], mpi[1], version_int[0])    
-            scotch_home = scotch_home % ( u"scotch", scotch_version,
-                                          compiler[0], compiler[1],
-                                          mpi[0], mpi[1], version_int[0])    
-    
+        prefix = g_root
+        scotch_home = g_root
+        prefix = os.path.join(prefix, programme, version,
+                              compiler[0], compiler[1])
+        if mpi:
+            prefix = os.path.join(prefix, mpi[0], mpi[1])
+        if "pastix" in programme:
+            prefix = os.path.join(prefix, "scotch", scotch_version)
+        prefix = os.path.join(prefix, version_int[0])
+        scotch_home = os.path.join(scotch_home,
+                                   u"scotch-nompi", scotch_version,
+                                   compiler[0], compiler[1])
+        if mpi:
+            scotch_home = os.path.join(scotch_home, mpi[0], mpi[1])
+        scotch_home = os.path.join(scotch_home,
+                                   version_int[0])
+
         modulefile = g_module_file
         if ("scotch" in programme):
             makefile = g_scotch_makefile
@@ -440,28 +436,28 @@ def install(programme, version, source_dir, scotch_version, libs):
                     makecmds = [[u"make", u"realclean"],
                                 [u"make", u"esmumps"],
                                 [u"mkdir", u"-p", prefix],
-                                [u"make", u"install"]] 
+                                [u"make", u"install"]]
                 else:
                     makecmds = [[u"make", u"realclean"],
                                 [u"make", u"scotch"],
                                 [u"mkdir", u"-p", prefix],
-                                [u"make", u"install"]] 
+                                [u"make", u"install"]]
             else:
                 if (u"esmumps" in programme  and not u"5.1.12" in version):
                     makecmds = [[u"make", u"realclean"],
                                 [u"make", u"esmumps", u"ptesmumps"],
                                 [u"mkdir", u"-p", prefix],
-                                [u"make", u"install"]] 
+                                [u"make", u"install"]]
                 else:
                     makecmds = [[u"make", u"realclean"],
                                 [u"make", u"scotch", u"ptscotch"],
                                 [u"mkdir", u"-p", prefix],
-                                [u"make", u"install"]] 
+                                [u"make", u"install"]]
         if (u"pastix" in programme):
             makefile = g_pastix_makefile
             modulefile = modulefile.replace(u"__modulename__", u"pastix")
             modulefile = modulefile.replace(u"__MODULENAME__", u"PASTIX")
-                     
+
             makefile_filename = u"%s/src/config.in" % source_dir
             makecmds = [[u"make", u"clean"],
                         [u"make", u"-j", u"examples"]]
@@ -532,13 +528,10 @@ def install(programme, version, source_dir, scotch_version, libs):
                 print out
                 print err
 
-def missing_installs(package_name, version, test, depends):
-    global g_base, g_base_nompi
+def missing_installs(package_name, version, test, depends, scotch_version):
+    global g_root
 
-    if (u"nompi" in package_name):
-        base=g_base_nompi
-    else:
-        base = g_base
+    base = g_root
     missing = []
     compiler = depends.pop(0)
     if (u"nompi" in package_name):
@@ -546,28 +539,33 @@ def missing_installs(package_name, version, test, depends):
     else:
         mpi      = depends.pop(0)
     for compiler in compilers:
-        if (u"nompi" in package_name):
-            if not os.path.exists(base % ( package_name, version,
-                                           compiler[0], compiler[1], test )):
-                missing.append([compiler, None])  
+        test_file = os.path.join(base, package_name, version,
+                                 compiler[0], compiler[1])
+        if u"nompi" in package_name:
+            if "pastix" in package_name:
+                test_file = os.path.join(test_file, "scotch", scotch_version)
+            test_file = os.path.join(test_file, test)
+            if not os.path.exists(test_file):
+                missing.append([compiler, None])
         else:
             for mpi in mpis:
-                if not os.path.exists(base % ( package_name, version,
-                                               compiler[0], compiler[1],
-                                               mpi[0], mpi[1], test )):
-
-                    mpi_lib = u"/opt/cluster/mpi/%s/%s/%s/%s" % (mpi[0], mpi[1],
-                                                                 compiler[0],
-                                                                 compiler[1])
+                test_file2 = os.path.join(test_file, mpi[0], mpi[1])
+                if "pastix" in package_name:
+                    test_file2 = os.path.join(test_file2, "scotch", scotch_version)
+                test_file2 = os.path.join(test_file2, test)
+                if not os.path.exists(test_file2):
+                    mpi_lib = os.path.join(u"/opt/cluster/mpi/",
+                                           mpi[0], mpi[1],
+                                           compiler[0], compiler[1])
 
                     if (os.path.exists(mpi_lib)):
-                        missing.append([compiler, mpi])  
+                        missing.append([compiler, mpi])
     return missing
 
 if __name__ == "__main__":
     from optparse import OptionParser
     # Defining the options of the program
-    usage="""usage: %prog -p programme -v version [options] 
+    usage="""usage: %prog -p programme -v version [options]
 
 Check what need to be installed.
 """
@@ -613,10 +611,10 @@ Check what need to be installed.
 
     # Parse the command line
     (options, args) = parser.parse_args()
-    
+
     compilers = get_available(u"compiler", [])
     mpis = get_available(u"mpi", [u"mpiexec"])
-    
+
     test = u"toto"
     if  u"scotch" in options.programme :
         test = u"int32/lib/libscotch.a"
@@ -654,7 +652,7 @@ Check what need to be installed.
                                         shutil.rmtree(os.path.join(base, mpi, version))
 
     if options.count or options.list or options.source_dir:
-        missings = missing_installs(options.programme, options.version, test, [compilers, mpis])
+        missings = missing_installs(options.programme, options.version, test, [compilers, mpis], options.scotch_version)
 
     if options.count:
         print "%d installations required" %( len(missings))
@@ -671,4 +669,3 @@ Check what need to be installed.
         for missing in missings:
             if not options.dryrun:
                 install(options.programme, options.version, options.source_dir, options.scotch_version, missing)
-            
