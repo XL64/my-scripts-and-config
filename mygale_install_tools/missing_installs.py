@@ -619,7 +619,7 @@ Check what need to be installed.
     
     test = u"toto"
     if  u"scotch" in options.programme :
-        test = u"int32/lib/libptscotch.a"
+        test = u"int32/lib/libscotch.a"
     if u"pastix" in options.programme:
         test = u"int32/lib/libpastix.a"
     if options.force:
@@ -656,7 +656,7 @@ Check what need to be installed.
         missings = missing_installs(options.programme, options.version, test, [compilers, mpis])
 
     if options.count:
-        print len(missings)
+        print "%d installations requires" %( len(missings))
     if options.list:
         for missing in missings:
             print missing
