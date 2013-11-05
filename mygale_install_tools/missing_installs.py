@@ -16,7 +16,7 @@ AR      = ar
 MAKE    = make
 ARFLAGS = -ruv	
 CAT     = cat
-CFLAGS  = -g -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DSCOTCH_DETERMINISTIC -DSCOTCH_PTHREAD -DSCOTCH_RENAME -DSCOTCH_RENAME_PARSER __TYPE__ -Drestrict=
+CFLAGS  = -g -O3 -DCOMMON_FILE_COMPRESS_GZ -DCOMMON_PTHREAD -DSCOTCH_DETERMINISTIC -DSCOTCH_PTHREAD -DSCOTCH_RENAME -DSCOTCH_RENAME_PARSER __TYPE__ -Drestrict= -fPIC
 LDFLAGS = -lz -lm -lrt
 LEX     = flex  -Pscotchyy -olex.yy.c
 YACC    = bison -pscotchyy -y -b y
@@ -77,11 +77,11 @@ BINDIR     = ${ROOT}/bin
 ###################################################################
 #                  SHARED LIBRARY GENERATION                      #
 ###################################################################
-#SHARED=1
-#SHARED_FLAGS =  -shared -Wl,-soname,__SO_NAME__
-#CCFDEB       := ${CCFDEB} -fPIC
-#CCFOPT       := ${CCFOPT} -fPIC
-#CFPROG       := ${CFPROG} -fPIC
+SHARED=1
+SHARED_FLAGS =  -shared -Wl,-soname,__SO_NAME__
+CCFDEB       := ${CCFDEB} -fPIC
+CCFOPT       := ${CCFOPT} -fPIC
+CFPROG       := ${CFPROG} -fPIC
 
 ###################################################################
 #                          INTEGER TYPE                           #
