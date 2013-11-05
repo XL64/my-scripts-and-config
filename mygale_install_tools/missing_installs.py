@@ -436,7 +436,7 @@ def install(programme, version, source_dir, scotch_version, libs):
             modulefile = modulefile.replace(u"__MODULENAME__", u"SCOTCH")
             makefile_filename = u"%s/src/Makefile.inc" % source_dir
             if (u"nompi" in programme):
-                if (u"esmumps" in programme):
+                if (u"esmumps" in programme and not u"5.1.12" in version):
                     makecmds = [[u"make", u"realclean"],
                                 [u"make", u"esmumps"],
                                 [u"mkdir", u"-p", prefix],
@@ -447,7 +447,7 @@ def install(programme, version, source_dir, scotch_version, libs):
                                 [u"mkdir", u"-p", prefix],
                                 [u"make", u"install"]] 
             else:
-                if (u"esmumps" in programme):
+                if (u"esmumps" in programme  and not u"5.1.12" in version):
                     makecmds = [[u"make", u"realclean"],
                                 [u"make", u"esmumps", u"ptesmumps"],
                                 [u"mkdir", u"-p", prefix],
