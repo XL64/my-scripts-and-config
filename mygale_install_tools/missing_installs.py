@@ -2,8 +2,8 @@ import subprocess
 import os, sys
 import shutil
 g_root = u"/opt/cluster/plafrim-dev/"
-g_modules =  u"module purge; module load compiler/%s/%s mpi/%s/%s lib/mkl/10.3.9.293 lib/hwloc/latest;"
-g_modules_nompi =  u"module purge; module load compiler/%s/%s lib/mkl/10.3.9.293 lib/hwloc/latest;"
+g_modules =  u"module purge; module load compiler/%s/%s mpi/%s/%s lib/mkl/latest lib/hwloc/latest;"
+g_modules_nompi =  u"module purge; module load compiler/%s/%s lib/mkl/latest lib/hwloc/latest;"
 g_scotch_makefile = u"""
 prefix  = __PREFIX__
 EXE     =
@@ -75,8 +75,8 @@ BINDIR     = ${ROOT}/bin
 ###################################################################
 #                  SHARED LIBRARY GENERATION                      #
 ###################################################################
-SHARED=1
-SHARED_FLAGS =  -shared -Wl,-soname,__SO_NAME__
+#SHARED=1
+#SHARED_FLAGS =  -shared -Wl,-soname,__SO_NAME__
 CCFDEB       := ${CCFDEB} -fPIC
 CCFOPT       := ${CCFOPT} -fPIC
 CFPROG       := ${CFPROG} -fPIC
@@ -464,7 +464,7 @@ def install(programme, version, source_dir, scotch_version, libs):
 
             makefile_filename = u"%s/src/config.in" % source_dir
             makecmds = [[u"make", u"clean"],
-                        [u"make", u"-j", u"examples"]]
+                        [u"make", u"examples"]]
         CC = get_var(u"CC", compiler, mpi)
         FC = get_var(u"FC", compiler, mpi)
         HWLOC_DIR = get_var(u"HWLOC_DIR", compiler, mpi)
