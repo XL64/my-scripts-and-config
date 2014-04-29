@@ -9,13 +9,13 @@ fi
 #echo $machine
 if [[ $machine == "Cronos" ]];
 then
-    export PATH=/usr/local/bin:/usr/local/sbin:$PATH
-    export PATH=/usr/local/share/python:$PATH
+    export HOMEBREW_GITHUB_API_TOKEN=13b4e681c8420d1d6c032b8791f2af02fcf2b098
+    export PATH=/usr/local/bin:/usr/local/sbin:/usr/texbin:$PATH
     export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
-# Finished adapting your PATH environment variable for use with MacPorts.
 
+    alias rm="safe-rm"
     alias mygalefs='mkdir /Volumes/mygale;sshfs lacoste@mygale: -ovolname=mygale -oping_diskarb -oreconnect /Volumes/mygale'
-    alias mygaleaccesfs='mkdir /Volumes/mygale;sshfs lacoste@mygale_acces: -ovolname=mygale -oping_diskarb -oreconnect /Volumes/mygale'
+    alias mygaleaccesfs='mkdir /Volumes/mygale;sshfs lacoste@mygale.acces: -ovolname=mygale -oping_diskarb -oreconnect /Volumes/mygale'
     alias vulcainfs='mkdir /Volumes/vulcain;sshfs lacoste@vulcain: -ovolname=vulcain -oping_diskarb -oreconnect /Volumes/vulcain'
     alias vulcainalgianefs='mkdir /Volumes/vulcain;sshfs froehly@vulcain_acces: -ovolname=vulcain -oping_diskarb -oreconnect /Volumes/vulcain'
     alias mediavulcainfs='mkdir /Volumes/media-vulcain;sshfs lacoste@vulcain:/media/vulcain/lacoste -ovolname=media-vulcain -oping_diskarb -oreconnect /Volumes/media-vulcain'
@@ -24,7 +24,9 @@ then
     alias vargasfs='vargaswd'
 
     alias newemacs="/Users/lacoste/Applications/Emacs.app/Contents/MacOS/Emacs"
-
+    function em () {
+	/Users/lacoste/Applications/Emacs.app/Contents/MacOS/Emacs "$@" &
+    }
     export HOMEBREW_EDITOR="emacs"
 fi
 
@@ -185,7 +187,7 @@ else
     fi
 fi
 
-plugins=(git)
+plugins=(git git-flow brew)
 
 source $ZSH/oh-my-zsh.sh
 unsetopt correct_all
