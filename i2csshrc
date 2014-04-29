@@ -1,0 +1,17 @@
+version: 2
+iterm2: false
+broadcast: true
+
+clusters:
+  feux:
+    hosts:
+      - vulcain
+      - loki
+      - agni
+      - hephaistos
+  feux_acces:
+    hosts:
+      - vulcain_acces
+      - loki_acces
+      - agni_acces
+      - hephaistos_acces
