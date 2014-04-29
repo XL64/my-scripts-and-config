@@ -30,7 +30,6 @@
 (load "~/.emacs.d/elisp/ess-12.09-2/lisp/ess-site")
 ;;(require 'ess-site)
 ;;(require 'tex-site)
-
 ;;(load "preview-latex.el" nil t t)
 (global-auto-revert-mode t)
 
