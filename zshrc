@@ -11,8 +11,9 @@ if [[ $machine == "Cronos" ]];
 then
     export HOMEBREW_GITHUB_API_TOKEN=13b4e681c8420d1d6c032b8791f2af02fcf2b098
     export PATH=/usr/local/bin:/usr/local/sbin:/usr/texbin:$PATH
-    export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
-
+    #export PYTHONPATH=/usr/local/lib/python2.7/site-packages:$PYTHONPATH
+    
+    alias vite="~/INRIA/vite/build_again/src/vite.app/Contents/MacOS/vite"
     alias rm="safe-rm"
     alias mygalefs='mkdir /Volumes/mygale;sshfs lacoste@mygale: -ovolname=mygale -oping_diskarb -oreconnect /Volumes/mygale'
     alias mygaleaccesfs='mkdir /Volumes/mygale;sshfs lacoste@mygale.acces: -ovolname=mygale -oping_diskarb -oreconnect /Volumes/mygale'
@@ -26,6 +27,12 @@ then
     alias newemacs="/Users/lacoste/Applications/Emacs.app/Contents/MacOS/Emacs"
     function em () {
 	/Users/lacoste/Applications/Emacs.app/Contents/MacOS/Emacs "$@" &
+    }
+    function these () {
+	cd $HOME/inria/Articles/2014/these-XL/en;
+	em these.tex;
+	cd build;
+	open these.pdf
     }
     export HOMEBREW_EDITOR="emacs"
 fi
